@@ -112,8 +112,8 @@ public class OrderProcessingSaga {
         try {
             // This block of code is used to test the chaining of compensation transactions of cancelShipmentCommand ->
             // cancelPaymentCommand -> cancelOrderCommand.
-            if (true)
-                throw new Exception();
+            /*if (true)
+                throw new Exception();*/
             CompleteOrderCommand completeOrderCommand = CompleteOrderCommand.builder()
                     .orderId(orderShippedEvent.getOrderId())
                     .orderStatus("APPROVED")
