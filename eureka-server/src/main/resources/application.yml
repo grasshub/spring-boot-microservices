@@ -1,0 +1,11 @@
+# Configure this Eureka Server
+eureka:
+  client:
+    registerWithEureka: false
+    fetchRegistry: false
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+
+# HTTP (Tomcat) port
+server:
+  port: 8761

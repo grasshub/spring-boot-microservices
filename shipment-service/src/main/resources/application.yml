@@ -1,0 +1,22 @@
+spring:
+  datasource:
+    url: "jdbc:h2:file:/data/ecomm_shipment;AUTO_SERVER=TRUE" # file storage and running as a server to avoid file locking.
+    driverClassName: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.H2Dialect
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+      settings:
+        web-allow-others: true
+
+# HTTP Server (Tomcat) Port
+server:
+  port: 5555
+

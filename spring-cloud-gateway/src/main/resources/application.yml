@@ -1,0 +1,32 @@
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id:  product-service
+          uri: lb://product-service  # URL of the Product Service load balancing lb://product-service
+          predicates:
+            - Path=/api/product/**
+
+# Enable discovery locator for dynamic routes for all microservices
+#      discovery:
+#        locator:
+#          enabled: true
+
+  application:
+    name: spring-cloud-gateway
+
+# Eureka Server Access
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+
+# HTTP Server (Tomcat) Port
+server:
+  port: 8000
+
+# Set the API Gateway logging level to DEBUG and RouteDefinitionLocation to INFO
+logging:
+  level:
+    org.springframework.cloud.gateway: TRACE
+    org.springframework.cloud.gateway.route.RouteDefinitionLocator: INFO

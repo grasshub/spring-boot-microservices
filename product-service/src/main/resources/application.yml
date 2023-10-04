@@ -1,0 +1,39 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/ecommerce
+    username: devuser
+    password: hangzhoU@1
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    # Display JPA sql DDL/DML at output screen for debugging purpose
+    show-sql: true
+
+  application:
+    name: product-service # Service Name (Eureka service id is all capital letters.)
+
+# Eureka Server Access
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+
+# HTTP Server (Tomcat) Port
+server:
+  port: 0
+
+# See schema.sql and data.sql SQL statements in the application log
+logging:
+  level:
+    org.springframework.jdbc.datasource.init.ScriptUtils: DEBUG
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - health
+          - info
+          - metrics
