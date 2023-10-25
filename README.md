@@ -344,3 +344,11 @@ and docker network inspect spring-boot-microservices_default to view all the det
 If you only update one service and want to only update this service with out affecting our service:
 
 docker compose up -d --no-deps orders-service
+
+Bitbucket account will not be supported early next year, need to switch all the coding to github under grasshub as follows:
+
+Under bash: git remote -v (See if it is point to Bitbucket repository)
+
+git remote set-url origin git@github.com:grasshub/spring-boot-microservices.git
+
+git push origin master (to push all the coding to github with the empty repository)
