@@ -1,0 +1,50 @@
+# Eureka Server Access
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+
+# HTTP Server (Tomcat) Port
+server:
+  port: 0
+
+spring:
+  application:
+    name: notification-service # Service Name (Eureka service id is all capital letters.)
+
+# Kafka properties
+  kafka:
+    bootstrap-servers: localhost:9092
+    template:
+      default-topic: notificationTopic
+    consumer:
+      group-id: notificationId
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring:
+          json:
+            type:
+              mapping: event:com.ecomm.notificationservice.event.OrderPlacedEvent
+
+# For setting the distributed tracing samples to 100%
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+
+# Actuator Prometheus endpoint
+  endpoints:
+    web:
+      exposure:
+        include: prometheus
+
+  zipkin:
+    tracing:
+      endpoint: http://localhost:9411/api/v2/spans
+
+logging:
+  pattern:
+    level: "%5p [${spring.application.name},%X{traceId:-},%X{spanId:-}]"
+
+

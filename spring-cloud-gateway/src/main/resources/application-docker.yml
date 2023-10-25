@@ -1,0 +1,22 @@
+# Use keycloak for the authentication of the spring cloud gateway
+Spring:
+  security:
+    oauth2:
+      resource-server:
+        jwt:
+          issuer-uri: http://keycloak:8080/realms/spring-boot-microservices-realm
+
+# Eureka Server Access
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://eureka-server:8761/eureka/
+
+# For setting the distributed tracing samples to 100%
+management:
+  zipkin:
+    tracing:
+      endpoint: http://zipkin:9411/api/v2/spans
+
+server:
+  port: 8080

@@ -7,7 +7,7 @@ public class ProductNotFoundException extends RuntimeException {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    public ProductNotFoundException(long id) {
+    public ProductNotFoundException(String id) {
         super("Product with id " + id + " not found");
     }
 }

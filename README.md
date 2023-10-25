@@ -184,3 +184,163 @@ Final Note
 This is just a high-level overview and pseudo configuration, and implementing a full-fledged microservices-based 
 e-commerce system involves thorough planning, designing, coding, and testing. You might need to dive deep into each 
 component and technology to configure and integrate them properly based on your actual requirements.
+
+To manually pass in logs and data directory containing db, add the mongod.cfg with content as follows:
+
+systemLog:
+  destination: file
+  path: C:\mongodb-win32-x86_64-windows-7.0.0\logs\mongodb-log
+  logAppend: true
+
+storage:
+  dbPath: C:\mongodb-win32-x86_64-windows-7.0.0\data
+
+And launch mongo as: mongod.exe --config mongod.cfg
+
+After running the Docker Desktop, eureka server will register microservice running at host.docker.internal:spring-cloud
+-gateway.
+The issue is altered hosts file by Docker Desktop under location: C:\Windows\System32\Drivers\etc\hosts, you will see
+eureka server does a host lookup from IP and host.docker.internal is returned. (local machine from docker's perspective)
+I guess Docker Desktop changed hosts with this line like follows:
+# Added by Docker Desktop
+192.168.1.190 host.docker.internal
+(Where 192.168.1.190 is my HP Envy Desktop IP4 address from comcast)
+In order to resolve this issue, just add one line above from my machine IP address to machine name from nslookup IP address
+like:
+192.168.1.190 HongEnvyDesktop.hsd1.de.comcast.net
+
+Spring Data MongoDB - Relation Modelling
+
+class Publisher {
+    private String name;
+    private String arconym;
+    private int foundationYear;
+
+    @ReadOnlyProperty
+    @DocumentReference(lookup="{'publisher':?#{#self._id} }")
+    List<Book> books;
+}
+
+class Book {
+    private String isbn13;
+    private String title;
+    private int pages;
+
+    @DocumentReference(lazy=true)
+    private Publisher publisher;
+}
+
+Use the following command to start Keycloak for the Authentication and Authorization for Spring Cloud Gateway to protect 
+the Microservices.
+
+docker run -p 8080:8080 -e KEYCLOAK_ADMIN=admin -e KEYCLOAK_ADMIN_PASSWORD=admin quay.io/keycloak/keycloak:22.0.4 start-dev
+
+Then access the Keycloak through localhost:8080 at web browser.
+
+After login with admin/admin, create a new realm named: spring-boot-microservices-realm and create it. Then create a client
+under Clients tab from top left, enter Client ID as: spring-cloud-client, and at next page select: Client authentication
+on, and select "Service accounts roles" only, click Save button. Click Credentials tab, at the "Client secret" field, 
+click the "Regenerate" button and copy the client secret to enter at the postman at specific test case under the 
+Authorization tab, 
+
+How to use docker Zipkin for the distributed tracing in Spring Boot 3.1.2 application:
+
+docker run -d -p 9411:9411 openzipkin/zipkin
+
+How to start Kafka from confluent local in Windows 11
+
+./confluent local kafka start
+
+./confluent local kafka topic create quickstart
+
+./confluent local kafka topic produce quickstart // Write message to a topic, Ctrl-C to exit
+
+./confluent local kafka topic consume quickstart --from-beginning // Consume message from a topic, Ctrl-C to exit
+
+./confluent local kafka stop 
+
+Start the docker container for Kafka for spring-boot-microservices through docker-composer.yml file, under root directory
+
+docker compose up -d
+
+You can find spring-boot-microservices container inside Docker Desktop
+
+You can use jib maven plugin to build the docker image without Dockerfile. Just add the following maven plugin dependency:
+
+<build>
+    <plugins>
+        <plugin>
+            <groupId>com.google.cloud.tools</groupId>
+            <artifactId>jib-maven-plugin</artifactId>
+            <version>3.3.2</version>
+            <configuration>
+                <from>
+                    <image>eclipse-temurin:20-jre</image>
+                </from>
+                <to>
+                    <image>registry.hub.docker.com/umyuh1/${project.artifactId}</image>
+                </to>
+                <container>
+                    <ports>
+                        <port>8082</port>
+                    </ports>
+                </container>
+            </configuration>
+        </plugin>
+    </plugins>
+</build>
+
+Also need to add your Docker Hub credentials to maven m2 settings.xml as:
+
+<servers>
+    <server>
+        <id>registry.hub.docker.com</id>
+        <username><DockerHub Username></username>
+        <password><DockerHub Password></password>
+    </server>
+</servers>
+
+You can find under your project Plugins section, there is jib plugin with jib:build to build the docker image and publish
+it to docker hub under your account repository. jib:dockerBuild just build the image without push it to docker hub.
+
+You will use: mvn clean compile jib:build under project level to build and publish docker image to docker hub.
+
+How to set up postgreSQL docker container?
+
+docker pull postgres:16
+docker volume create inventory-service-postgreSQL
+docker run -d --name postgres -p 5432:5432 -e POSTGRES_PASSWORD=hangzhoU@1 -v inventory-service-postgreSQL:/var/lib/postgresql/data 
+postgres:16
+
+Need use -e POSTGRES_PASSWORD=XXXX to set up super user postgres password first time, and create docker volume ecommerce-postgres-volume
+and mount it to /var/lib/postgresql/data folder inside postgres container to persist data after restart.
+
+Then you can stop the postgreSQL windows service, and launch the pgAdmin to add a connection to postgreSQL container as
+localhost and create a devuser fore development.
+
+You can add the follow instructions under docker compose file to execute the initial queries to create postgre devuser,
+initial database like orders-service and change the ownership of orders-service database to devuser as:
+
+volumes:
+# Copy the sql script to create devuser and database
+- ./sql/orders-service.sql:/docker-entrypoint-initdb.d/orders-service.sql
+
+(Create a local sql folder contains initial sql script orders-service.sql and mount it to docker 
+/docker-entrypoint-initdb.d/orders-service.sql to be executed at docker initial stage.)
+
+From docker command: docker exec -it postgres psql -U postgres 
+Enter interactive psql shell to run SQl commands and manage your postgreSQL database.
+
+In order to make sure all the microservices and dependent services like keycloak, kafka broker, inventory-service-PostgreSQL
+can communicate to each other as service at different containers inside docker, all the services should belong to the 
+same network. If you use docker-compose.yml to define all the services, docker will create all these services at different
+containers and create a default network like spring-boot-microservices_default (default to root project name) for all
+these services. You can visualize them inside Docker Desktop containers view within the hierarchy of same network as:
+spring-boot-microservices.
+
+Use docker network ls to find all docker network
+and docker network inspect spring-boot-microservices_default to view all the details of specific network.
+
+If you only update one service and want to only update this service with out affecting our service:
+
+docker compose up -d --no-deps orders-service

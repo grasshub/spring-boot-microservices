@@ -1,18 +1,21 @@
 spring:
-  datasource:
-    url: jdbc:postgresql://localhost:5432/ecommerce
-    username: devuser
-    password: hangzhoU@1
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/product_service
 
   jpa:
     hibernate:
       ddl-auto: update
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
     # Display JPA sql DDL/DML at output screen for debugging purpose
     show-sql: true
 
   application:
     name: product-service # Service Name (Eureka service id is all capital letters.)
+
+# Use to invoke schema.sql and data.sql each time application is started
+#  sql:
+#    init:
+#      mode: always
 
 # Eureka Server Access
 eureka:
@@ -33,7 +36,13 @@ management:
   endpoints:
     web:
       exposure:
-        include:
-          - health
-          - info
-          - metrics
+        include: prometheus
+
+# For setting the distributed tracing samples to 100%
+  tracing:
+    sampling:
+      probability: 1.0
+
+  zipkin:
+    tracing:
+      endpoint: http://localhost:9411/api/v2/spans

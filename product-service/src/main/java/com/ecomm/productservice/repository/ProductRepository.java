@@ -1,7 +1,7 @@
 package com.ecomm.productservice.repository;
 
 import com.ecomm.productservice.domain.Product;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.mongodb.repository.MongoRepository;
 
-public interface ProductRepository extends JpaRepository<Product, Long> {
+public interface ProductRepository extends MongoRepository<Product, String> {
 }

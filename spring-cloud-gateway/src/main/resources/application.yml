@@ -2,15 +2,44 @@ spring:
   cloud:
     gateway:
       routes:
-        - id:  product-service
+        - id: product-service
           uri: lb://product-service  # URL of the Product Service load balancing lb://product-service
           predicates:
             - Path=/api/product/**
 
+        - id: orders-service
+          uri: lb://orders-service  # URL of the Orders Service load balancing lb://orders-service
+          predicates:
+            - Path=/api/order/**
+
+        - id: inventory-service
+          uri: lb://inventory-service  # URL of the Inventory Service load balancing lb://inventory-service
+          predicates:
+            - Path=/api/inventory/**
+
+        - id: eureka-server
+          uri: http://localhost:8761  # URL of the eureka server
+          predicates:
+            - Path=/eureka/web
+          filters:
+            - SetPath=/
+
+        - id: eureka-server-static
+          uri: http://localhost:8761  # URL of the eureka server static
+          predicates:
+            - Path=/eureka/**
+
 # Enable discovery locator for dynamic routes for all microservices
-#      discovery:
-#        locator:
-#          enabled: true
+      discovery:
+        locator:
+          enabled: true
+
+# Use keycloak for the authentication of the spring cloud gateway
+  security:
+    oauth2:
+      resource-server:
+        jwt:
+          issuer-uri: http://localhost:8080/realms/spring-boot-microservices-realm
 
   application:
     name: spring-cloud-gateway
@@ -23,10 +52,30 @@ eureka:
 
 # HTTP Server (Tomcat) Port
 server:
-  port: 8000
+  port: 8181
 
 # Set the API Gateway logging level to DEBUG and RouteDefinitionLocation to INFO
 logging:
   level:
     org.springframework.cloud.gateway: TRACE
     org.springframework.cloud.gateway.route.RouteDefinitionLocator: INFO
+  pattern:
+    level: "%5p [${spring.application.name},%X{traceId:-},%X{spanId:-}]"
+
+# For setting the distributed tracing samples to 100%
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+
+# Actuator Prometheus endpoint
+  endpoints:
+    web:
+      exposure:
+        include: prometheus
+
+  zipkin:
+    tracing:
+      endpoint: http://localhost:9411/api/v2/spans
+
+

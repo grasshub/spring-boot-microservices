@@ -1,0 +1,3 @@
+CREATE DATABASE IF NOT EXISTs 'orders-service';
+
+CREATE USER devuser WITH PASSWORD 'hangzhoU@1'

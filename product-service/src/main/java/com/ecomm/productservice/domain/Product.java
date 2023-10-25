@@ -1,24 +1,29 @@
 package com.ecomm.productservice.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-@Entity
+import java.math.BigDecimal;
+
+@Document(collection = "product")
 @Getter
 @Setter
+@Builder
 public class Product {
 
+//    @Transient
+//    public static final String SEQUENCE = "product_sequence";
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
     private String name;
     private String description;
-    private Double price;
+    private BigDecimal price;
 
     // Constructors, Getters, and Setters
 }

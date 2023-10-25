@@ -4,6 +4,7 @@ import com.ecomm.productservice.domain.Product;
 import com.ecomm.productservice.exception.ProductNotFoundException;
 import com.ecomm.productservice.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
+import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,8 +14,10 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
+
+    private final ProductSequenceService productSequenceService;
     @Override
-    public Optional<Product> getProductById(Long id) {
+    public Optional<Product> getProductById(String id) {
         return productRepository.findById(id);
     }
 
@@ -24,7 +27,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Product updateProduct(Long id, Product product) {
+    public Product updateProduct(String id, Product product) {
         Product existingProduct = productRepository.findById(id)
                 .orElseThrow(() -> new ProductNotFoundException(id));
 
@@ -34,16 +37,17 @@ public class ProductServiceImpl implements ProductService {
             existingProduct.setDescription(product.getDescription());
         if (product.getPrice() != null)
             existingProduct.setPrice(product.getPrice());
-        return productRepository.save(product);
+        return productRepository.save(existingProduct);
     }
 
     @Override
     public Product saveProduct(Product product) {
+      //  product.setId(productSequenceService.generateProductSequence(Product.SEQUENCE));
         return productRepository.save(product);
     }
 
     @Override
-    public void deleteProduct(Long id) {
+    public void deleteProduct(String id) {
         productRepository.deleteById(id);
     }
 }

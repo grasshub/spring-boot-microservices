@@ -1,0 +1,130 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5431/orders-service
+    username: devuser
+    password: hangzhoU@1
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    # Display JPA sql DDL/DML at output screen for debugging purpose
+    show-sql: true
+
+  application:
+    name: orders-service # Service Name (Eureka service id is all capital letters.
+
+# Kafka properties
+  kafka:
+    bootstrap-servers: localhost:9092
+    template:
+      default-topic: notificationTopic
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring:
+          json:
+            type:
+              mapping: event:com.ecomm.ordersservice.event.OrderPlacedEvent
+
+# Use to invoke schema.sql and data.sql each time application is started
+#  sql:
+#    init:
+#      mode: always
+
+# Eureka Server Access
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+
+# HTTP Server (Tomcat) Port
+server:
+  port: 0
+
+# Actuator endpoint for circuit breaker pattern
+management:
+  health:
+    circuitbreakers:
+      enabled: true
+    ratelimiters:
+      enabled: true
+
+  endpoint:
+    health:
+      show-details: always
+
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+
+# For setting the distributed tracing samples to 100%
+  tracing:
+    sampling:
+      probability: 1.0
+
+  zipkin:
+    tracing:
+      endpoint: http://localhost:9411/api/v2/spans
+
+# Resilience4j Properties for Circuit Breaker
+resilience4j:
+  circuitbreaker:
+    instances:
+      inventory:
+        registerHealthIndicator: true
+        event-consumer-buffer-size: 10
+        slidingWindowType: COUNT_BASED
+        slidingWindowSize: 5
+        failureRateThreshold: 50
+        waitDurationInOpenState: 5s
+        permittedNumberOfCallsInHalfOpenState: 3
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+
+# Resilience4j Timeout Property
+  timelimiter:
+    instances:
+      inventory:
+        timeout-duration: 3s
+
+#Resilience4J Retry Properties
+  retry:
+    instances:
+      inventory:
+        max-attempts: 3
+        wait-duration: 3s
+
+# Resilience4j Properties for Bulkhead Thread Pool and Waiting Queue
+  thread-pool-bulkhead:
+    instances:
+      inventory:
+        event-consumer-buffer-size: 10
+        core-thread-pool-size: 7
+        max-thread-pool-size: 10
+        queue-capacity: 10
+        keep-alive-duration: 5000
+
+    metrics:
+      enabled: true
+
+# Resilience4j Properties for Bulkhead Semaphore
+#  bulkhead:
+#    instances:
+#      inventory:
+#        max-concurrent-calls: 10
+#        max-wait-duration: 5000
+#        event-consumer-buffer-size: 5
+
+#    metrics:
+#      enabled: true
+
+logging:
+  pattern:
+    level: "%5p [${spring.application.name},%X{traceId:-},%X{spanId:-}]"
+
+
+
+
+
+

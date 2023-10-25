@@ -6,6 +6,30 @@ eureka:
     serviceUrl:
       defaultZone: http://localhost:8761/eureka/
 
+spring:
+  application:
+    name: eureka-server #Service Name (Eureka service id is all capital letters.)
+
 # HTTP (Tomcat) port
 server:
   port: 8761
+
+# For setting the distributed tracing samples to 100%
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+
+# Actuator Prometheus endpoint
+  endpoints:
+    web:
+      exposure:
+        include: prometheus
+
+  zipkin:
+    tracing:
+      endpoint: http://localhost:9411/api/v2/spans
+
+logging:
+  pattern:
+    level: "%5p [${spring.application.name},%X{traceId:-},%X{spanId:-}]"
